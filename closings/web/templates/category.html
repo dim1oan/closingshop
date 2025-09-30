@@ -1,0 +1,121 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ category.name }} - OBSHAGA_STORE{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Главная</a></li>
+            <li class="breadcrumb-item active">{{ category.name }}</li>
+        </ol>
+    </nav>
+    
+    <h1 class="mb-4">{{ category.name }}</h1>
+    <p class="lead">{{ category.description or 'Откройте лучшие товары в этой категории' }}</p>
+    
+    <!-- Фильтры -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <select class="form-select" id="sort-select">
+                <option value="newest">Сначала новинки</option>
+                <option value="price_asc">По возрастанию цены</option>
+                <option value="price_desc">По убыванию цены</option>
+                <option value="popular">Популярные</option>
+            </select>
+        </div>
+        <div class="col-md-6 text-end">
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-primary active" data-view="grid">
+                    <i class="fas fa-th"></i> Сетка
+                </button>
+                <button type="button" class="btn btn-outline-primary" data-view="list">
+                    <i class="fas fa-list"></i> Список
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Товары -->
+    <div class="row" id="products-grid">
+        {% for product in products %}
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card product-card h-100">
+                {% if product.discount > 0 %}
+                <span class="badge bg-danger category-badge">-{{ product.discount }}%</span>
+                {% endif %}
+                <a href="{{ url_for('product', product_id=product.id) }}">
+                    <img src="{{ product.image_url or 'https://via.placeholder.com/250x300' }}" 
+                         class="card-img-top" alt="{{ product.name }}">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{{ url_for('product', product_id=product.id) }}" class="text-decoration-none">
+                            {{ product.name }}
+                        </a>
+                    </h5>
+                    <p class="card-text">{{ product.description[:100] }}...</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        {% if product.discount > 0 %}
+                        <div>
+                            <span class="text-muted text-decoration-line-through">{{ product.price }} руб.</span>
+                            <span class="h5 text-danger ms-2">{{ (product.price * (1 - product.discount/100)) | round | int }} руб.</span>
+                        </div>
+                        {% else %}
+                        <span class="h5 text-primary">{{ product.price }} руб.</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-primary w-100 add-to-cart" data-product-id="{{ product.id }}">
+                        <i class="fas fa-shopping-cart"></i> В корзину
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Пагинация -->
+    {% if products|length == 0 %}
+    <div class="text-center py-5">
+        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+        <h3>Товары не найдены</h3>
+        <p>Попробуйте изменить параметры поиска</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Переключение вида
+    document.querySelectorAll('[data-view]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('[data-view]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            if (this.dataset.view === 'list') {
+                document.getElementById('products-grid').classList.add('list-view');
+            } else {
+                document.getElementById('products-grid').classList.remove('list-view');
+            }
+        });
+    });
+</script>
+
+<style>
+    .list-view .col-lg-3 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    .list-view .product-card {
+        flex-direction: row;
+    }
+    .list-view .product-card img {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}

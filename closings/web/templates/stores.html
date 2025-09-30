@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Склад</h1>
+    
+    <div class="row">
+        {% for product in products %}
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card product-card h-100">
+                    {% if product.discount > 0 %}
+                    {% endif %}
+                    <img src="{{ product.image_url or 'https://via.placeholder.com/250x300' }}" class="card-img-top" alt="{{ product.name }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text">{{ product.description[:100] }}...</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            {% if product.discount > 0 %}
+                            <div>
+                                <span class="text-muted text-decoration-line-through">{{ product.price }} руб.</span>
+                                <span class="h5 text-danger ms-2">{{ product.price - product.price_down}} руб.</span>
+                            </div>
+                            {% else %}
+                            <span class="h5 text-primary">{{ product.price }} руб.</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="/wantbuyitem/{{ product.id }}" class="btn btn-outline-primary">
+                            <i class="fas fa-shopping-cart"></i> Добавить в корзину
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    {% if current_user.is_admin %}
+    <div class="mt-4">
+        <a href="{{ url_for('add_item') }}" class="btn btn-primary">Добавить магазин</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

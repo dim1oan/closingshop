@@ -1,0 +1,83 @@
+{% extends "layout.html" %}
+
+{% block title %}Профиль - OBSHAGA_STORE{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Профиль пользователя</h1>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h4>{{ current_user.username }}</h4>
+                    <p class="text-muted">{{ current_user.email }}</p>
+                    <p>Зарегистрирован: {{ current_user.created_at.strftime('%d.%m.%Y') }}</p>
+                    {% if current_user.sity and current_user.sity != 'None' %}
+                        <p>Город: {{ current_user.sity }}</p>
+                    {% endif %}
+                    {% if current_user.gender and current_user.gender != 'None' %}
+                        <p>Пол: {{ current_user.gender }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#orders" data-bs-toggle="tab">Заказы</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#settings" data-bs-toggle="tab">Настройки</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card-body">
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="orders">
+                            <h5>История заказов</h5>
+                            {% if current_user.buy_list %}
+                                {% for order in current_user.buy_list %}
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between">
+                                            <h6>Заказ #{{ order.id }}</h6>
+                                            <span class="badge bg-success">Завершен</span>
+                                        </div>
+                                        <p>Дата: {{ order.created_at.strftime('%d.%m.%Y %H:%M') if order.created_at else 'Не указана' }}</p>
+                                        <p>Сумма: {{ order.price }} руб.</p>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <p>У вас пока нет заказов</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="tab-pane" id="settings">
+                            <h5>Настройки аккаунта</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" value="{{ current_user.email }}" readonly>
+                                <small class="form-text text-muted">Email нельзя изменить</small>
+                            </div>
+
+                            <!-- Формы для изменения дополнительных данных -->
+                            <div class="mb-3">
+                                <a href="{{ url_for('change_sity') }}" class="btn btn-outline-primary">Изменить город</a>
+                                <a href="{{ url_for('change_gender') }}" class="btn btn-outline-primary">Изменить пол</a>
+                                <a href="{{ url_for('change_product_interest') }}" class="btn btn-outline-primary">Изменить интересы</a>
+                                <a href="{{ url_for('change_password') }}" class="btn btn-outline-primary">Изменить пароль</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

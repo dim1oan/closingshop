@@ -1,0 +1,96 @@
+{% extends "layout.html" %}
+
+{% block title %}Регистрация - OBSHAGA_STORE{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Регистрация</h2>
+                    
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-danger">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="{{ url_for('register') }}">
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            {{ form.email(class="form-control", id="email", required=true) }}
+                            {% if form.email.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.email.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Пароль</label>
+                            {{ form.password(class="form-control", id="password", required=true) }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password_again" class="form-label">Подтвердите пароль</label>
+                            {{ form.password_again(class="form-control", id="password_again", required=true) }}
+                            {% if form.password_again.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.password_again.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="gender" class="form-label">Ваш пол</label>
+                            {{ form.gender(class="form-control", id="gender", required=true) }}
+                            <small class="form-text text-muted">Мужской/Женский</small>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            {{ form.is_invite(class="form-check-input", id="is_invite") }}
+                            <label class="form-check-label" for="is_invite">Вас пригласили?</label>
+                        </div>
+
+                        <div class="mb-3" id="invite-field" style="display: none;">
+                            <label for="user_invite" class="form-label">Код приглашения</label>
+                            {{ form.user_invite(class="form-control", id="user_invite") }}
+                        </div>
+
+                        {{ form.submit(class="btn btn-primary w-100") }}
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <p>Уже есть аккаунт? <a href="{{ url_for('login') }}">Войти</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const inviteCheckbox = document.getElementById('is_invite');
+    const inviteField = document.getElementById('invite-field');
+
+    inviteCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            inviteField.style.display = 'block';
+        } else {
+            inviteField.style.display = 'none';
+            document.getElementById('user_invite').value = '';
+        }
+    });
+});
+</script>
+{% endblock %}
